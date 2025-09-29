@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lagna Chart</title>
+
+</head>
+
+<body>
+    <canvas id="lagnaChart" width="700" height="700" style="border:1px solid #ccc;"></canvas>
+    <script>
+        const canvas = document.getElementById("lagnaChart");
+        const ctx = canvas.getContext("2d");
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Fill black background
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, w, h);
+
+        // Set stroke color for lines
+        ctx.strokeStyle = "white";
+
+        // Draw outer diamond
+        ctx.beginPath();
+        ctx.moveTo(w / 2, 0); // Top
+        ctx.lineTo(w, h / 2); // Right
+        ctx.lineTo(w / 2, h); // Bottom
+        ctx.lineTo(0, h / 2); // Left
+        ctx.closePath();
+        ctx.stroke();
+
+        // Draw cross lines (center square)
+        // ctx.beginPath();
+        // ctx.moveTo(w / 2, 0); // Top to Bottom
+        // ctx.lineTo(w / 2, h);
+        // ctx.moveTo(0, h / 2); // Left to Right
+        // ctx.lineTo(w, h / 2);
+        // ctx.stroke();
+
+        // Draw diagonals
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(w, h);
+        ctx.moveTo(w, 0);
+        ctx.lineTo(0, h);
+        ctx.stroke();
+
+        // Add labels for 12 houses
+        // const labels = [
+        //     "Asc-8.53 Ju-17.1",
+        //     "",
+        //     "Ve-0.06 Ma-10.63",
+        //     "Mo-7.81 Sa-12.77",
+        //     "",
+        //     "Ke-19.16",
+        //     "",
+        //     "Pl-28.33",
+        //     "Ne-20.81",
+        //     "",
+        //     "Ur-10.82",
+        //     "Me-2.82 Ra-19.16 Su-14.14",
+        // ];
+
+        // House coordinates (approximate positioning)
+        const positions = [
+            [220, 220],
+            [270, 270], // 2
+            [320, 320], // 3
+            [370, 270], // 4
+            [420, 220], // 5
+            [370, 170], // 6
+            [320, 120], // 7
+            [270, 70], // 8
+            [220, 120], // 9
+            [170, 170], // 10
+            [120, 220], // 11
+            [170, 270], // 12
+        ];
+
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "white"; // Set font color to white for visibility
+        ctx.textAlign = "center";
+
+        labels.forEach((label, i) => {
+            const [x, y] = positions[i];
+            if (label) {
+                const lines = label.split(" ");
+                lines.forEach((line, j) => {
+                    ctx.fillText(line, x, y + j * 14);
+                });
+            }
+        });
+    </script>
+
+
+</body>
+
+</html>

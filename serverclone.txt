@@ -1,0 +1,273 @@
+const express = require('express');
+const axios = require('axios');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+// Generate HTML chart from horoscope data
+function generateChartHTML(data) {
+    const planetsData = data.planets_data || [];
+    const housesData = data.houses_data || [];
+    const consolidatedData = data.consolidated_chart_data || {};
+
+    // Create house grid layout (4x4)
+    const houseLayout = [
+        [11, 12, 1, 2],
+        [10, 'blank', 'blank', 3],
+        [9, 'blank', 'blank', 4],
+        [8, 7, 6, 5]
+    ];
+
+    // Helper function to get house content
+    function getHouseContent(houseNum) {
+        if (houseNum === 'blank') {
+            return `
+        <div style="text-align: center; font-size: 14px; color: #2c3e50; line-height: 1.4;">
+          <div><strong>Vedic Chart</strong></div>
+          <div>Generated: ${new Date().toLocaleString()}</div>
+        </div>
+      `;
+        }
+
+        const house = housesData.find(h => h.HouseNr === houseNum);
+        const planets = planetsData.filter(p => p.HouseNr === houseNum);
+
+        // Get zodiac sign symbol/image
+        const getZodiacSymbol = (sign) => {
+            const symbols = {
+                'Aries': '♈',
+                'Taurus': '♉',
+                'Gemini': '♊',
+                'Cancer': '♋',
+                'Leo': '♌',
+                'Virgo': '♍',
+                'Libra': '♎',
+                'Scorpio': '♏',
+                'Sagittarius': '♐',
+                'Capricorn': '♑',
+                'Aquarius': '♒',
+                'Pisces': '♓'
+            };
+            return symbols[sign] || '';
+        };
+
+        let content = `<div style="color: #e74c3c; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
+      House ${houseNum} 
+      <p style="color: #7F39DB">${house ? house.SignLonDecDeg.toFixed(1) + '°' : ''}</p>
+    </div>`;
+
+        if (house) {
+            const zodiacSymbol = getZodiacSymbol(house.Rasi);
+            content += `<div style="color: #7f8c8d; font-size: 14px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">
+        <span style="font-size: 16px;">${zodiacSymbol}</span>
+        <span>${house.Rasi}</span>
+      </div>`;
+        }
+
+        planets.forEach(planet => {
+            const retrograde = planet.isRetroGrade ? ' ℞' : '';
+            content += `<div style="color: #2c3e50; font-weight: bold; font-size: 11px; margin: 1px 0;">
+        ${planet.Object} ${planet.SignLonDecDeg.toFixed(1)}°${retrograde}
+      </div>`;
+        });
+
+        return content;
+    }
+
+    function toRoman(num) {
+        const romans = {
+            1: 'I',
+            2: 'II',
+            3: 'III',
+            4: 'IV',
+            5: 'V',
+            6: 'VI',
+            7: 'VII',
+            8: 'VIII',
+            9: 'IX',
+            10: 'X',
+            11: 'XI',
+            12: 'XII'
+        };
+        return romans[num] || num;
+    }
+
+    // Generate grid HTML
+    let gridHTML = '';
+    houseLayout.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+            if (cell === 'blank' && (rowIndex !== 1 || colIndex !== 1)) {
+                return; // Skip duplicate blank cells (only show center content once)
+            }
+
+            const isCenter = cell === 'blank';
+            const cellStyle = `
+        border: 1px solid #666;
+        padding: 8px;
+        font-size: 11px;
+        line-height: 1.2;
+        background: ${isCenter ? '#e8f4f8' : '#f9f9f9'};
+        min-height: 140px;
+        position: relative;
+        overflow: hidden;
+        ${isCenter ? 'grid-column: span 2; grid-row: span 2; border: 2px solid #3498db; display: flex; align-items: center; justify-content: center;' : ''}
+      `;
+
+            gridHTML += `<div style="${cellStyle}">${getHouseContent(cell)}</div>`;
+        });
+    });
+
+    // Generate planets table
+    let planetsTableHTML = '<tr><th>Planet</th><th>Sign</th><th>Degree</th><th>House</th><th>Nakshatra</th><th>Retrograde</th></tr>';
+    planetsData.forEach(planet => {
+        planetsTableHTML += `
+      <tr>
+        <td>${planet.Object}</td>
+        <td>${planet.Rasi}</td>
+        <td>${planet.SignLonDecDeg.toFixed(2)}°</td>
+        <td>${planet.HouseNr}</td>
+        <td>${planet.Nakshatra}</td>
+        <td>${planet.isRetroGrade ? 'Yes' : 'No'}</td>
+      </tr>
+    `;
+    });
+
+    // Generate houses table
+    let housesTableHTML = '<tr><th>House</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>Lord</th></tr>';
+    housesData.forEach(house => {
+        housesTableHTML += `
+      <tr>
+        <td>${toRoman(house.HouseNr)}</td>
+        <td>${house.Rasi}</td>
+        <td>${house.SignLonDecDeg.toFixed(2)}°</td>
+        <td>${house.Nakshatra}</td>
+        <td>${house.RasiLord}</td>
+      </tr>
+    `;
+    });
+
+    return `
+
+    
+<!doctype html>
+<html>
+<head>
+<title>South Indian</title>
+  <meta charset="utf-8" />
+  <title>Cross with Base64 Background</title>
+  <style>
+    .box {
+      width: 400px;
+      height: 400px;
+      position: relative;
+ 
+      /* Base64 PNG background (a tiny gray checker pattern here as demo) */
+      background-image:url(data:image/png;base64,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);
+      background-size: cover;
+      background-position: center;
+      border: 1px solid #ccc;
+    }
+ 
+ 
+  </style>
+</head>
+<body>
+  <div class="box">
+ 
+    <div style="position:absolute;margin-left: 340px; margin-top: 40px;font-weight: bold;color:#ff0000"></div>
+    <div style="position:absolute;margin-left: 520px; margin-top: 130px;font-weight: bold;color:#ff7f00"></div>
+    <div style="position:absolute;margin-left: 610px; margin-top: 270px;font-weight: bold;color:#ffd700"></div>
+    <div style="position:absolute;margin-left: 520px; margin-top: 400px;font-weight: bold;color:#32cd32"></div>
+    <div style="position:absolute;margin-left: 340px; margin-top: 490px;font-weight: bold;color:#008000"></div>
+    <div style="position:absolute;margin-left: 150px; margin-top: 400px;font-weight: bold;color:#40e0d0"</div>
+    <div style="position:absolute;margin-left: 60px; margin-top: 270px;font-weight: bold;color:#0000ff"></div>
+    <div style="position:absolute;margin-left: 150px; margin-top: 130px;font-weight: bold;color:#4b0082"></div>
+    <div style="position:absolute;margin-left: 245px; margin-top: 85px;font-weight: bold;color:#9400d3"></div>
+    <div style="position:absolute;margin-left: 440px; margin-top: 85px;font-weight: bold;color:#ff1493"></div>
+    <div style="position:absolute;margin-left: 440px; margin-top: 450px;font-weight: bold;color:#8b4513"></div>
+    <div style="position:absolute;margin-left: 245px; margin-top: 450px;font-weight: bold;color:#708090"></div>
+  </div>
+  <div style="
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background:#fffef6;
+    border: 2px solid #999;
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-template-rows: repeat(4, 100px);
+    title>South Indian</title>
+">
+    <!-- Row 1 -->
+    <div style="border:1px solid #999; display:flex; justify-content:center; align-items:center; font-size:12px; color:#e74c3c;">Su-14.14°</div>
+    <div style="border:1px solid #999; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:12px; color:#27ae60;">Me-2.82° <br> Ra-19.16°</div>
+    <div style="border:1px solid #999; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:12px; color:#e84393;">Ve-0.06° <br> Ma-10.63°</div>
+    <div style="border:1px solid #999; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:12px; color:#2980b9;">Mo-7.81° <br> Sa-12.77°</div>
+
+    <!-- Row 2 -->
+    <div style="border:1px solid #999; display:flex; justify-content:center; align-items:center; font-size:12px; color:#2980b9;">Ur-10.82°</div>
+    <div></div>
+    <div></div>
+    <div style="border:1px solid #999;"></div>
+
+    <!-- Row 3 -->
+    <div style="border:1px solid #999; display:flex; justify-content:center; align-items:center; font-size:12px; color:#16a085;">Ne-20.81°</div>
+    <div></div>
+    <div></div>
+    <div style="border:1px solid #999;"></div>
+
+    <!-- Row 4 -->
+    <div style="border:1px solid #999; display:flex; justify-content:center; align-items:center; font-size:12px; color:#8e44ad;">Pl-28.33°</div>
+    <div style="border:1px solid #999; display:flex; justify-content:center; align-items:center; font-size:12px; color:#2c3e50;">Ke-19.16°</div>
+    <div style="border:1px solid #999;"></div>
+    <div style="border:1px solid #999; display:flex; flex-direction:column; justify-content:center; align-items:center; font-size:12px; color:#d35400;">Ju-17.1° <br><span style="color:#8e44ad;">Asc-8.54°</span></div>
+</div>
+  
+</body>
+</html>
+ 
+ 
+ `;
+}
+
+// Main API endpoint
+app.post('/api/horoscope', async(req, res) => {
+    try {
+        console.log('Received payload:', req.body);
+
+        // Call horoscope API
+        const response = await axios.post(
+            'https://aiguruji.quarkgen.ai/vedicastro/get_all_horoscope_data',
+            req.body, {
+                headers: { "Content-Type": "application/json" }
+            }
+        );
+
+        const data = response.data;
+        console.log('API Response received successfully');
+
+        // Generate and return HTML with real data
+        const html = generateChartHTML(data);
+        res.setHeader('Content-Type', 'text/html');
+        res.send(html);
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).send(`
+      <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2 style="color: #e74c3c;">Error</h2>
+          <p>Failed to generate horoscope chart: ${error.message}</p>
+        </body>
+      </html>
+    `);
+    }
+});
+
+
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Send POST request to /api/horoscope with your payload`);
+});

@@ -1,0 +1,285 @@
+const express = require('express');
+const axios = require('axios');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+// Generate HTML chart from horoscope data
+function generateChartHTML(data) {
+    const planetsData = data.planets_data || [];
+    const housesData = data.houses_data || [];
+    const consolidatedData = data.consolidated_chart_data || {};
+
+    // Create house grid layout (4x4)
+    const houseLayout = [
+        [11, 12, 1, 2],
+        [10, 'blank', 'blank', 3],
+        [9, 'blank', 'blank', 4],
+        [8, 7, 6, 5]
+    ];
+
+    // Helper function to get house content
+    function getHouseContent(houseNum) {
+        if (houseNum === 'blank') {
+            return `
+        <div style="text-align: center; font-size: 14px; color: #2c3e50; line-height: 1.4;">
+          <div><strong>Vedic Chart</strong></div>
+          <div>Generated: ${new Date().toLocaleString()}</div>
+        </div>
+      `;
+        }
+
+        const house = housesData.find(h => h.HouseNr === houseNum);
+        const planets = planetsData.filter(p => p.HouseNr === houseNum);
+
+        // Get zodiac sign symbol/image
+        const getZodiacSymbol = (sign) => {
+            const symbols = {
+                'Aries': '♈',
+                'Taurus': '♉',
+                'Gemini': '♊',
+                'Cancer': '♋',
+                'Leo': '♌',
+                'Virgo': '♍',
+                'Libra': '♎',
+                'Scorpio': '♏',
+                'Sagittarius': '♐',
+                'Capricorn': '♑',
+                'Aquarius': '♒',
+                'Pisces': '♓'
+            };
+            return symbols[sign] || '';
+        };
+
+        let content = `<div style="color: #e74c3c; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
+      House ${houseNum} 
+      <p style="color: #7F39DB">${house ? house.SignLonDecDeg.toFixed(1) + '°' : ''}</p>
+    </div>`;
+
+        if (house) {
+            const zodiacSymbol = getZodiacSymbol(house.Rasi);
+            content += `<div style="color: #7f8c8d; font-size: 14px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">
+        <span style="font-size: 16px;">${zodiacSymbol}</span>
+        <span>${house.Rasi}</span>
+      </div>`;
+        }
+
+        planets.forEach(planet => {
+            const retrograde = planet.isRetroGrade ? ' ℞' : '';
+            content += `<div style="color: #2c3e50; font-weight: bold; font-size: 11px; margin: 1px 0;">
+        ${planet.Object} ${planet.SignLonDecDeg.toFixed(1)}°${retrograde}
+      </div>`;
+        });
+
+        return content;
+    }
+
+    function toRoman(num) {
+        const romans = {
+            1: 'I',
+            2: 'II',
+            3: 'III',
+            4: 'IV',
+            5: 'V',
+            6: 'VI',
+            7: 'VII',
+            8: 'VIII',
+            9: 'IX',
+            10: 'X',
+            11: 'XI',
+            12: 'XII'
+        };
+        return romans[num] || num;
+    }
+
+    // Generate grid HTML
+    let gridHTML = '';
+    houseLayout.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+            if (cell === 'blank' && (rowIndex !== 1 || colIndex !== 1)) {
+                return; // Skip duplicate blank cells (only show center content once)
+            }
+
+            const isCenter = cell === 'blank';
+            const cellStyle = `
+        border: 1px solid #666;
+        padding: 8px;
+        font-size: 11px;
+        line-height: 1.2;
+        background: ${isCenter ? '#e8f4f8' : '#f9f9f9'};
+        min-height: 140px;
+        position: relative;
+        overflow: hidden;
+        ${isCenter ? 'grid-column: span 2; grid-row: span 2; border: 2px solid #3498db; display: flex; align-items: center; justify-content: center;' : ''}
+      `;
+
+            gridHTML += `<div style="${cellStyle}">${getHouseContent(cell)}</div>`;
+        });
+    });
+
+    // Generate planets table
+    let planetsTableHTML = '<tr><th>Planet</th><th>Sign</th><th>Degree</th><th>House</th><th>Nakshatra</th><th>Retrograde</th></tr>';
+    planetsData.forEach(planet => {
+        planetsTableHTML += `
+      <tr>
+        <td>${planet.Object}</td>
+        <td>${planet.Rasi}</td>
+        <td>${planet.SignLonDecDeg.toFixed(2)}°</td>
+        <td>${planet.HouseNr}</td>
+        <td>${planet.Nakshatra}</td>
+        <td>${planet.isRetroGrade ? 'Yes' : 'No'}</td>
+      </tr>
+    `;
+    });
+
+    // Generate houses table
+    let housesTableHTML = '<tr><th>House</th><th>Sign</th><th>Degree</th><th>Nakshatra</th><th>Lord</th></tr>';
+    housesData.forEach(house => {
+        housesTableHTML += `
+      <tr>
+        <td>${toRoman(house.HouseNr)}</td>
+        <td>${house.Rasi}</td>
+        <td>${house.SignLonDecDeg.toFixed(2)}°</td>
+        <td>${house.Nakshatra}</td>
+        <td>${house.RasiLord}</td>
+      </tr>
+    `;
+    });
+
+    return `
+
+    <!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lagna Chart</title>
+    
+</head>
+
+<body>
+    <canvas id="lagnaChart" width="10" height="10" style="border:1px solid #ae1414ff;"></canvas>
+    <script>
+        const canvas = document.getElementById("lagnaChart");
+        const ctx = canvas.getContext("2d");
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, w, h);
+
+        
+        ctx.strokeStyle = "white";
+
+       
+        ctx.beginPath();
+        ctx.moveTo(w / 2, 0); 
+        ctx.lineTo(w, h / 2);
+        ctx.lineTo(w / 2, h); 
+        ctx.lineTo(0, h / 2);
+        ctx.closePath();
+        ctx.stroke();
+
+        
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(w, h);
+        ctx.moveTo(w, 0);
+        ctx.lineTo(0, h);
+        ctx.stroke();
+
+        const positions = [
+            [220, 220], 
+            [270, 270], 
+            [320, 320], 
+            [370, 270], 
+            [420, 220], 
+            [370, 170], 
+            [320, 120], 
+            [270, 70], 
+            [220, 120], 
+            [170, 170], 
+            [120, 220], 
+            [170, 270], 
+        ];
+
+        ctx.font = "12px Arial";
+        ctx.fillStyle = "white"; 
+        ctx.textAlign = "center";
+
+        labels.forEach((label, i) => {
+            const [x, y] = positions[i];
+            if (label) {
+                const lines = label.split(" ");
+                lines.forEach((line, j) => {
+                    ctx.fillText(line, x, y + j * 14);
+                });
+            }
+        });
+    </script>
+
+    
+</body>
+
+</html>
+  `;
+}
+
+// Main API endpoint
+app.post('/api/horoscope', async(req, res) => {
+    // Generate and return HTML
+    const html = generateChartHTML({});
+    res.setHeader('Content-Type', 'text/html');
+    res.send(html);
+
+    return
+    try {
+        console.log('Received payload:', req.body);
+
+        // Make request to horoscope API using axios
+        const response = await axios.post('https://aiguruji.quarkgen.ai/vedicastro/get_all_horoscope_data', req.body, {
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'en-US,en;q=0.9,hi;q=0.8',
+                'Connection': 'keep-alive',
+                'Content-Type': 'application/json',
+                'Origin': 'https://aiguruji.quarkgen.ai',
+                'Referer': 'https://aiguruji.quarkgen.ai/',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin',
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36',
+                'sec-ch-ua': '"Google Chrome";v="137", "Chromium";v="137", "Not/A)Brand";v="24"',
+                'sec-ch-ua-mobile': '?0',
+                'sec-ch-ua-platform': '"macOS"'
+            }
+        });
+
+        const data = response.data;
+        console.log('API Response received successfully');
+
+        // Generate and return HTML
+        const html = generateChartHTML(data);
+        res.setHeader('Content-Type', 'text/html');
+        res.send(html);
+
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).send(`
+      <html>
+        <body style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2 style="color: #e74c3c;">Error</h2>
+          <p>Failed to generate horoscope chart: ${error.message}</p>
+        </body>
+      </html>
+    `);
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Send POST request to /api/horoscope with your payload`);
+});
