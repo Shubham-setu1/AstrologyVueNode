@@ -1,1 +1,0 @@
-https://aiguruji.quarkgen.ai/vedicastro/get_all_horoscope_data
