@@ -3,7 +3,8 @@ const axios = require('axios');
 
 const app = express();
 
-const {templedekhoLogo,northInidaBackground,ariesLogo} = require('./imagesb64')
+const { templedekhoLogo, northIndiaBackground, ariesLogo, geminiLogo, aquariusLogo, capricornLogo, SagittariusLogo, scorpioLogo, libraLogo, virgoLogo, leoLogo, cancerLogo, taurusLogo, piscesLogo } = require('./imagesb64')
+
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
@@ -24,7 +25,7 @@ function generateChartHTMLNorthIndian(data) {
 
     // Helper function to get house content
     function getHouseContent(houseNum) {
-      // North
+        // North
         if (houseNum === 'blank') {
             return `
         <div style="text-align: center; font-size: 14px; color: #2c3e50; line-height: 1.4;">
@@ -168,7 +169,7 @@ function generateChartHTMLNorthIndian(data) {
       position: relative;
  
       /* Base64 PNG background (a tiny gray checker pattern here as demo) */
-      background-image:url(${northInidaBackground});
+      background-image:url(${northIndiaBackground});
       background-size: cover;
       background-position: center;
       border: 1px solid #ccc;
@@ -415,64 +416,115 @@ function generateChartHTMLSouthIndian(data) {
       text-align: center;
     }
 
-    .logo-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background-image:url(${templedekhoLogo});
-     
-  
-      background-size: cover;
-      background-position: center;
-      z-index: 10;
-    }
+   .logo-overlay {
+  position: absolute;
+  top: 70%;
+  left: 70%;
+  /* move right (+X) and down (+Y) by reducing translate values slightly */
+  transform: translate(-45%, -45%); 
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-image: url(${templedekhoLogo});
+  background-size: cover;
+  background-position: center;
+  z-index: 10;
+}
+
   </style>
 
 <body>
 
 <div class="chart-container">
   <!-- Row 1 -->
-  <div class="chart-cell" style="color:#2c3e50;">${getHouseContent(12)}</div>
-  <div class="chart-cell" style="color:#27ae60;">${getHouseContent(1)}</div>
-  <div class="chart-cell" style="color:#e84393;">Ve-0.06°<br>Ma-10.63°</div>
-  <div class="chart-cell" style="color:#2980b9;">Mo-7.81°<br>Sa-12.77°</div>
+  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(2)}</span>
+  <img src="${piscesLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
+ <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(3)}</span>
+  <img src="${ariesLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
+ <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(4)}</span>
+  <img src="${taurusLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
+  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(5)}</span>
+  <img src="${geminiLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
 
   <!-- Row 2 -->
-  <div class="chart-cell" style="color:#2980b9;">Ur-10.82°</div>
+ <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(1)}</span>
+  <img src="${aquariusLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
   <div></div>
   <div></div>
-  <div class="chart-cell"></div>
+  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(6)}</span>
+  <img src="${cancerLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
 
   <!-- Row 3 -->
-  <div class="chart-cell" style="font-size:12px; color:#16a085;">Ne-20.81°</div>
-  <div> </div>
+  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(12)}</span>
+  <img src="${capricornLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
   <div></div>
-  <div class="chart-cell"></div>
+  <div></div>
+ <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(7)}</span>
+  <img src="${leoLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
 
   <!-- Row 4 -->
-  <div class="chart-cell" style="
-    font-size:12px;
-    // background-image:url(${ariesLogo});
-    background-size:cover;
-    background-position:center;
-    background-blur:2px;
-  ">Pl-28.33°</div>
-  <div class="chart-cell" style="font-size:12px; color:#2c3e50;">Ke-19.16°</div>
-  <div class="chart-cell"></div>
-  <div class="chart-cell" style="font-size:12px; color:#d35400;">
-    Ju-17.1°<br><span style="color:#8e44ad;">Asc-8.54°</span>
-  </div>
+  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(11)}</span>
+  <img src="${SagittariusLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
+  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(10)}</span>
+  <img src="${scorpioLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
+
+  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(9)}</span>
+  <img src="${libraLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
+ <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
+  <span style="color:#8e44ad;">${getHouseContent(8)}</span>
+  <img src="${virgoLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
+</div>
 
   <!-- Logo Overlay -->
   <div class="logo-overlay"></div>
 </div>
+ <div style="
+    position: absolute;
+    top: 50%;
+    left: 22%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.4;
+    color: #2c3e50;
+    font-weight: 600;
+   
+    padding: 8px 12px;
+    border-radius: 8px;
+  ">
+    
+    <br><br><br><br><br><br><span style="font-weight:900;">Name:</span><strong>John Doe</strong><br>
+    <br><b>Time:</b> 01 January 2010, 10:34:35<br>
+    <br><b>Location:</b>Mumbai<br>
+    <br>Lat, Lon: 19.076, 72.8777
+  </div>
 </div>
 
 </body>
+
+
 
 
   
