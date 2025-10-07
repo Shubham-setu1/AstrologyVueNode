@@ -58,17 +58,17 @@ function generateChartHTMLNorthIndian(data) {
         };
 
         let content = `<div style="color: #e74c3c; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
-      House ${houseNum} 
-      <p style="color: #7F39DB">${house ? house.SignLonDecDeg.toFixed(1) + '°' : ''}</p>
-    </div>`;
+        
+          <p style="color: #7F39DB">${house ? house.SignLonDecDeg.toFixed(1) + '°' : ''}</p>
+        </div>`;
 
-        if (house) {
-            const zodiacSymbol = getZodiacSymbol(house.Rasi);
-            content += `<div style="color: #7f8c8d; font-size: 14px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">
-        <span style="font-size: 16px;">${zodiacSymbol}</span>
-        <span>${house.Rasi}</span>
-      </div>`;
-        }
+        // if (house) {
+        //     const zodiacSymbol = getZodiacSymbol(house.Rasi);
+        //     content += `<div style="color: #7f8c8d; font-size: 14px; margin-bottom: 2px; display: flex; align-items: center; gap: 2px;">
+        //    <span style="font-size: 16px;">${zodiacSymbol}</span>
+        //   <span>${house.Rasi}</span>
+        // </div>`;
+        // }
 
         planets.forEach(planet => {
             const retrograde = planet.isRetroGrade ? ' ℞' : '';
@@ -162,6 +162,9 @@ function generateChartHTMLNorthIndian(data) {
   <meta charset="utf-8" />
   <title>Cross with Base64 Background</title>
   <style>
+  * {
+    font-family: 'Roboto', sans-serif;
+  }
     .box {
       width: 600px;
       height: 600px;
@@ -181,41 +184,41 @@ function generateChartHTMLNorthIndian(data) {
 <body>
   <div class="box">
  
-     <div style="position:absolute; margin-left: 260px; margin-top: 336px; font-weight: bold; color:#b22222; text-align:center;font-size:10px">${getHouseContent(4)}
+     <div style="position:absolute; margin-left: 280px; margin-top: 336px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 4 ${getHouseContent(12)}
         </div>
-    <div style="position:absolute; margin-left: 120px; margin-top: 480px; font-weight: bold; color:#9932cc; text-align:center;font-size:10px">
-          ${getHouseContent(3)}
+    <div style="position:absolute; margin-left: 130px; margin-top: 480px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 3
+          ${getHouseContent(11)}
         </div>
-     <div style="position:absolute; margin-left: 390px; margin-top: 490px; font-weight: bold; color:#1e90ff; text-align:center;font-size:10px">${getHouseContent(5)}
+     <div style="position:absolute; margin-left: 410px; margin-top: 490px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 5 ${getHouseContent(1)}
         </div>
-     <div style="position:absolute; margin-left: 25px; margin-top: 370px; font-weight: bold; color:#008b8b; text-align:center;font-size:10px">
-            ${getHouseContent(2)}
-        </div>
-     <div style="position:absolute; margin-left: 127px; margin-top:190px; font-weight: bold;color:#b22222; text-align:center;font-size:10px">
-            ${getHouseContent(1)} 
-            
-        </div>
-     <div style="position:absolute; margin-left: 124px; margin-top: 20px; font-weight: bold; color:#b22222; text-align:center;font-size:10px">
-            ${getHouseContent(11)}
-        </div>
-     <div style="position:absolute; margin-left: 266px; margin-top: 60px; font-weight: bold; color:#008b8b; text-align:center;font-size:10px">
+     <div style="position:absolute; margin-left: 25px; margin-top: 370px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 2
             ${getHouseContent(10)}
         </div>
-
-    <div style="position:absolute; margin-left: 417px; margin-top: 18px; font-weight: bold; color:pink; text-align:center;font-size:10px">
-            ${getHouseContent(9)}
+     <div style="position:absolute; margin-left: 127px; margin-top:190px; font-weight: bold;color:#7F39DB; text-align:center;font-size:10px">House 1
+            ${getHouseContent(9)} 
+            
         </div>
-    <div style="position:absolute; margin-left: 510px; margin-top: 90px; font-weight: bold; color:blue; text-align:center;font-size:10px">
-            ${getHouseContent(8)}
-        </div>
-    <div style="position:absolute; margin-left: 400px; margin-top: 190px; font-weight: bold; color:#228b22; text-align:center;font-size:10px">
+     <div style="position:absolute; margin-left: 124px; margin-top: 20px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 11
             ${getHouseContent(7)}
         </div>
-    <div style="position:absolute; margin-left: 490px; margin-top: 380px; font-weight: bold; color:#228b22; text-align:center;font-size:10px">    
-    ${getHouseContent(6)}
+     <div style="position:absolute; margin-left: 266px; margin-top: 60px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 10
+            ${getHouseContent(6)}
         </div>
-    <div style="position:absolute; margin-left: 25px; margin-top: 90px; font-weight: bold; color:#4682b4; text-align:center;font-size:10px">
-        ${getHouseContent(12)}    
+
+    <div style="position:absolute; margin-left: 417px; margin-top: 18px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 9 ${getHouseContent(5)}
+            
+        </div>
+    <div style="position:absolute; margin-left: 510px; margin-top: 90px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">
+            House 8${getHouseContent(4)}
+        </div>
+    <div style="position:absolute; margin-left: 412px; margin-top: 190px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">House 7
+            ${getHouseContent(3)}
+        </div>
+    <div style="position:absolute; margin-left: 520px; margin-top: 380px; font-weight: bold; color:##7F39DB; text-align:center;font-size:10px"> House 6   ${getHouseContent(2)}
+    
+        </div>
+    <div style="position:absolute; margin-left: 25px; margin-top: 90px; font-weight: bold; color:#7F39DB; text-align:center;font-size:10px">
+      House 12  ${getHouseContent(8)}    
         </div>
   </div>
 
@@ -274,17 +277,18 @@ function generateChartHTMLSouthIndian(data) {
         };
 
         let content = `<div style="color: #e74c3c; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
-      House ${houseNum} 
+
+ 
       <p style="color: #7F39DB">${house ? house.SignLonDecDeg.toFixed(1) + '°' : ''}</p>
     </div>`;
 
-        if (house) {
-            const zodiacSymbol = getZodiacSymbol(house.Rasi);
-            content += `<div style="color: #7f8c8d; font-size: 6px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">
-        <span style="font-size: 16px;">${zodiacSymbol}</span>
-        <span>${house.Rasi}</span>
-      </div>`;
-        }
+        //   if (house) {
+        //       const zodiacSymbol = getZodiacSymbol(house.Rasi);
+        //       content += `<div style="color: #7f8c8d; font-size: 6px; margin-bottom: 2px; display: flex; align-items: center; gap: 4px;">
+        //   <span style="font-size: 16px;">${zodiacSymbol}</span>
+        //   <span>${house.Rasi}</span>
+        // </div>`;
+        //   }
 
         planets.forEach(planet => {
             const retrograde = planet.isRetroGrade ? ' ℞' : '';
@@ -377,7 +381,9 @@ function generateChartHTMLSouthIndian(data) {
 <title>South Indian</title>
   <meta charset="utf-8" />
   <title>Cross with Base64 Background</title>
-  <style>
+  <style> * {
+    font-family: 'Roboto', sans-serif;
+  }
     .box {
       width: 600px;
       height: 600px;
@@ -397,6 +403,7 @@ function generateChartHTMLSouthIndian(data) {
  <div>
   <style>
     .chart-container {
+    background-color:#ffe5cc;
       position: relative;
       top: 10px;
       width: 600px;
@@ -438,62 +445,62 @@ function generateChartHTMLSouthIndian(data) {
 <div class="chart-container">
   <!-- Row 1 -->
   <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(2)}</span>
+  <span style="color:#8e44ad;">House 12 ${getHouseContent(8)}</span>
   <img src="${piscesLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(3)}</span>
+  <span style="color:#8e44ad;">House 1 ${getHouseContent(9)}</span>
   <img src="${ariesLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(4)}</span>
+  <span style="color:#8e44ad;">House 2 ${getHouseContent(10)}</span>
   <img src="${taurusLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
   <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(5)}</span>
+  <span style="color:#8e44ad;">House 3 ${getHouseContent(11)}</span>
   <img src="${geminiLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
 
   <!-- Row 2 -->
  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(1)}</span>
+  <span style="color:#8e44ad;">House 11 ${getHouseContent(7)}</span>
   <img src="${aquariusLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
   <div></div>
   <div></div>
   <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(6)}</span>
+  <span style="color:#8e44ad;">House 4 ${getHouseContent(2)}</span>
   <img src="${cancerLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
 
   <!-- Row 3 -->
   <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(12)}</span>
+  <span style="color:#8e44ad;">House 10 ${getHouseContent(6)}</span>
   <img src="${capricornLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
   <div></div>
   <div></div>
  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(7)}</span>
+  <span style="color:#8e44ad;">House 5 ${getHouseContent(5)}</span>
   <img src="${leoLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
 
   <!-- Row 4 -->
   <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(11)}</span>
+  <span style="color:#8e44ad;">House 9 ${getHouseContent(12)}</span>
   <img src="${SagittariusLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
   <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(10)}</span>
+  <span style="color:#8e44ad;">House 8 ${getHouseContent(4)}</span>
   <img src="${scorpioLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
 
   <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(9)}</span>
+  <span style="color:#8e44ad;">House 7 ${getHouseContent(3)}</span>
   <img src="${libraLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
  <div class="chart-cell" style="position:relative; font-size:12px; color:#2c3e50;">
-  <span style="color:#8e44ad;">${getHouseContent(8)}</span>
+  <span style="color:#8e44ad;">House 6 ${getHouseContent(1)}</span>
   <img src="${virgoLogo}" style="height:20px; width:20px; position:absolute; right:5px; bottom:5px;">
 </div>
 
@@ -516,9 +523,9 @@ function generateChartHTMLSouthIndian(data) {
   ">
     
     <br><br><br><br><br><br><span style="font-weight:900;">Name:</span><strong>John Doe</strong><br>
-    <br><b>Time:</b> 01 January 2010, 10:34:35<br>
-    <br><b>Location:</b>Mumbai<br>
-    <br>Lat, Lon: 19.076, 72.8777
+    <br><span style="font-weight:900;">Time:</span> 01 January 2010, 10:34:35<br>
+    <br><span style="font-weight:900;">Location:</span>Mumbai<br>
+    <br><span style="font-weight:900;">Lat, Lon:</span> 19.076, 72.8777
   </div>
 </div>
 
