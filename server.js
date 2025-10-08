@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // Generate HTML chart from horoscope data
-function generateChartHTMLNorthIndian(data) {
+function generateChartHTMLNorthIndian(data,payloadData) {
     const planetsData = data.planets_data || [];
     const housesData = data.houses_data || [];
     const consolidatedData = data.consolidated_chart_data || {};
@@ -59,7 +59,7 @@ function generateChartHTMLNorthIndian(data) {
 
         let content = `<div style="color: #e74c3c; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
         
-          <p style="color: #7F39DB">${house ? house.SignLonDecDeg.toFixed(1) + '°' : ''}</p>
+        <br>
         </div>`;
 
         // if (house) {
@@ -230,9 +230,20 @@ function generateChartHTMLNorthIndian(data) {
  `;
 }
 
-function generateChartHTMLSouthIndian(data) {
+function generateChartHTMLSouthIndian(data,payloadData) {
     const planetsData = data.planets_data || [];
     const housesData = data.houses_data || [];
+    const username = payloadData.name
+    const userlocation = payloadData.location
+    const latitude = payloadData.latitude
+    const longitude = payloadData.longitude
+    const dateofbirth = payloadData.day
+    const monthofbirth = payloadData.month
+    const yearofbirth = payloadData.year
+    const timeofbirth = payloadData.hour + ":" + payloadData.minute + ":" + payloadData.second
+
+
+
 
 
     // Create house grid layout (4x4)
@@ -279,7 +290,7 @@ function generateChartHTMLSouthIndian(data) {
         let content = `<div style="color: #e74c3c; font-weight: bold; font-size: 12px; margin-bottom: 4px;">
 
  
-      <p style="color: #7F39DB">${house ? house.SignLonDecDeg.toFixed(1) + '°' : ''}</p>
+        <br>
     </div>`;
 
         //   if (house) {
@@ -509,7 +520,7 @@ function generateChartHTMLSouthIndian(data) {
 </div>
  <div style="
     position: absolute;
-    top: 50%;
+    top: 250px;
     left: 22%;
     transform: translate(-50%, -50%);
     text-align: center;
@@ -521,11 +532,11 @@ function generateChartHTMLSouthIndian(data) {
     padding: 8px 12px;
     border-radius: 8px;
   ">
-    
-    <br><br><br><br><br><br><span style="font-weight:900;">Name:</span><strong>John Doe</strong><br>
-    <br><span style="font-weight:900;">Time:</span> 01 January 2010, 10:34:35<br>
-    <br><span style="font-weight:900;">Location:</span>Mumbai<br>
-    <br><span style="font-weight:900;">Lat, Lon:</span> 19.076, 72.8777
+
+    <br><br><br><br><br><br><span style="font-weight:900;">Name:</span><strong> ${username}</strong><br>
+    <br><span style="font-weight:900;">Time:</span> ${dateofbirth}/ ${monthofbirth}/ ${yearofbirth}, ${timeofbirth}<br>
+    <br><span style="font-weight:900;">Location:</span> ${userlocation}<br>
+    <br><span style="font-weight:900;">Lat, Lon:</span> ${latitude}, ${longitude}
   </div>
 </div>
 
@@ -547,7 +558,7 @@ app.post('/api/horoscope', async(req, res) => {
     try {
         console.log('Received payload:', req.body);
         var chartType = req.body.chart_type
-
+        const payloadData = req.body;
         // Call horoscope API
         const response = await axios.post(
             'https://aiguruji.quarkgen.ai/vedicastro/get_all_horoscope_data',
@@ -557,15 +568,16 @@ app.post('/api/horoscope', async(req, res) => {
         );
 
         const data = response.data;
+
         console.log('API Response received successfully', data);
 
         // Generate and return HTML with real data
         var html = ""
 
         if (chartType === "South Indian") {
-            html = generateChartHTMLSouthIndian(data)
+            html = generateChartHTMLSouthIndian(data,payloadData)
         } else {
-            html = generateChartHTMLNorthIndian(data)
+            html = generateChartHTMLNorthIndian(data,payloadData)
         }
         res.setHeader('Content-Type', 'text/html');
         res.send(html);
